@@ -35,10 +35,10 @@ $(document).ready(function() {
 
     var now = moment();
     console.log(now);
-    var minutesAway = frequency - now.diff(moment(firstTrain), "m") % frequency;
+    var minutesAway =frequency-(now.diff(moment(firstTrain,"HH:mm"), "m") % frequency);
     console.log(minutesAway);
 
-    var nextArrival = now + minutesAway;
+    var nextArrival =now.add(minutesAway,'m').format("HH:mm");
     console.log(nextArrival);
 
     database.ref().push({
