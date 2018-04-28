@@ -1,18 +1,19 @@
-var config = {
-  apiKey: "AIzaSyCK4Kyb_zFivj066kfbIIJAcZGmW_od9P8",
-  authDomain: "myfirstproject-dadc7.firebaseapp.com",
-  databaseURL: "https://myfirstproject-dadc7.firebaseio.com",
-  projectId: "myfirstproject-dadc7",
-  storageBucket: "myfirstproject-dadc7.appspot.com",
-  messagingSenderId: "492394548265"
-};
-// firebase.initializeApp(config);
+
+  var config = {
+    apiKey: "AIzaSyDY4TI7NEO97Foy9cD3qQaSoG6RK3HOg9w",
+    authDomain: "train-time-2c099.firebaseapp.com",
+    databaseURL: "https://train-time-2c099.firebaseio.com",
+    projectId: "train-time-2c099",
+    storageBucket: "",
+    messagingSenderId: "593056116399"
+  };
+
 firebase.initializeApp(config);
 // Create a variable to reference the database
 var database = firebase.database();
 
 $(document).ready(function() {
-  $("#submit-info").on("click", function(event) {
+  $("#add-train-info").on("submit", function(event) {
     event.preventDefault();
     var trainName = $("#train-name")
       .val()
@@ -27,29 +28,30 @@ $(document).ready(function() {
       .val()
       .trim();
 
-    console.log("hello");
-    console.log(trainName);
-    console.log(destination);
-    console.log(firstTrain);
-    console.log(frequency);
-
     var now = moment();
-    console.log(now);
-    var minutesAway =frequency-(now.diff(moment(firstTrain,"HH:mm"), "m") % frequency);
-    console.log(minutesAway);
+    var firstTrainParsed=moment(firstTrain,"HH:mm");
+    var minutesAwayAfterFirst = frequency-(now.diff(firstTrainParsed, "m") % frequency);
+    var minutesAwayBeforeFirst= firstTrainParsed.diff(now, "m");
+    var minutesAway=0;
 
-    var nextArrival =now.add(minutesAway,'m').format("HH:mm");
-    console.log(nextArrival);
-
+    if(firstTrainParsed.before()){
+      minutesAway=minutesAwayBeforeFirst;
+      
+    } else{
+      mnutesAway=minutesAwayAfterFirst;
+    }
+    var nextArrival = now.add(minutesAway,'m').format("HH:mm");
     database.ref().push({
       name: trainName,
       destination: destination,
-      starts: firstTrain,
+      start: firstTrain,
       frequency: frequency,
       next: nextArrival,
       minutes: minutesAway
     });
-    database.ref().on("child_added", function(childSnapshot) {
+  
+    }); 
+     database.ref().on("child_added", function(childSnapshot) {
       var newTrain = $("<tr>");
 
       newTrain
@@ -60,6 +62,5 @@ $(document).ready(function() {
         .append(`<td scope="row">${childSnapshot.val().minutes}</td>`);
 
       $("tbody").append(newTrain);
-    });
   });
 });
