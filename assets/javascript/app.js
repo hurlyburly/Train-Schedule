@@ -30,17 +30,20 @@ $(document).ready(function() {
 
     var now = moment();
     var firstTrainParsed=moment(firstTrain,"HH:mm");
-    var minutesAwayAfterFirst = frequency-(now.diff(firstTrainParsed, "m") % frequency);
-    var minutesAwayBeforeFirst= firstTrainParsed.diff(now, "m");
+    var afterFirstTrain = frequency-(now.diff(firstTrainParsed, "m") % frequency);
+
+    //rounded the var beforeFirstTrain up in order to counteract moment.js's default of rounding down the integers so the next arrival and minutes away displays don't lose a minute in instances where you log the train time before the train starts. 
+    var beforeFirstTrain= Math.ceil((firstTrainParsed.diff(now, "m",true)));
     var minutesAway=0;
 
-    if(firstTrainParsed.before()){
-      minutesAway=minutesAwayBeforeFirst;
-      
+    if(firstTrainParsed.isAfter(now)){
+      minutesAway=beforeFirstTrain;
     } else{
-      mnutesAway=minutesAwayAfterFirst;
+      minutesAway=afterFirstTrain;
     }
+
     var nextArrival = now.add(minutesAway,'m').format("HH:mm");
+
     database.ref().push({
       name: trainName,
       destination: destination,
